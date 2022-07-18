@@ -159,25 +159,25 @@ cd hello-world
 ### Поднятие ноды и валидатора(пока бессмуслены)
 Testnet details
 
-Network Chain ID: gitopia-janus-testnet
-Denom: tlore
-gitopiad version: 
-Faucet: 
-Cosmos explorer: https://explorer.gitopia.com/validators
-Офф инструкция: https://docs.gitopia.com/gitopiad
-Платформа: https://gitopia.com/
++ Network Chain ID: gitopia-janus-testnet
++ Denom: tlore
++ Cosmos explorer: https://explorer.gitopia.com/validators
++ Офф инструкция: https://docs.gitopia.com/gitopiad
++ Платформа: https://gitopia.com/
 
-Подготовка сервера
-Берем сервер cpx31
+### Подготовка сервера
+#### Берем сервер cpx31
 
-Обновляем репозитории
-
+### Обновляем репозитории
+```
 sudo apt update && sudo apt upgrade -y
-Устанавливаем необходимые утилиты
-
+```
+#### Устанавливаем необходимые утилиты
+```
 sudo apt install curl build-essential git wget jq make gcc tmux -y
-Устанавливаем Go ОДНОЙ КОМАНДОЙ
-
+```
+#### Устанавливаем Go ОДНОЙ КОМАНДОЙ
+```
 wget https://golang.org/dl/go1.18.1.linux-amd64.tar.gz; \
 rm -rv /usr/local/go; \
 tar -C /usr/local -xzf go1.18.1.linux-amd64.tar.gz && \
@@ -185,59 +185,74 @@ rm -v go1.18.1.linux-amd64.tar.gz && \
 echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> ~/.bash_profile && \
 source ~/.bash_profile && \
 go version
-Установка ноды
-ВАЖНО — в командах ниже все, что в <> меняем на свое значение и убираем сами <>
+```
+#### Установка ноды
+#### ВАЖНО — в командах ниже все, что в <> меняем на свое значение и убираем сами <>
 
-Устанавливаем git remote helper
-
+#### Устанавливаем git remote helper
+```
 curl https://get.gitopia.com | bash
-Устанавливаем бинарники
-
+```
+#### Устанавливаем бинарники
+```
 git clone gitopia://gitopia1dlpc7ps63kj5v0kn5v8eq9sn2n8v8r5z9jmwff/gitopia && cd gitopia
 make install
 gitopiad version
-# 0.13.0
-
+```
+### 0.13.0
+```
 git clone gitopia://gitopia1dlpc7ps63kj5v0kn5v8eq9sn2n8v8r5z9jmwff/testnets
-Инициализируем ноду, чтобы создать необходимые файлы конфигурации
-
+```
+### Инициализируем ноду, чтобы создать необходимые файлы конфигурации
+```
 gitopiad init <name_node> --chain-id gitopia-janus-testnet
-Cоздаем или восстанавливаем кошелек и сохраняем вывод
+```
+#### Cоздаем или восстанавливаем кошелек и сохраняем вывод
 
-# создать кошелек
+#### создать кошелек
+```
 gitopiad keys add <name_wallet>
-
-# восстановить кошелек (после команды вставить seed)
+```
+#### восстановить кошелек (после команды вставить seed)
+```
 gitopiad keys add <name_wallet> --recover
-Скачиваем Genesis
-
+```
+#### Скачиваем Genesis
+```
 cp /root/testnets/gitopia-janus-testnet/genesis.json /root/.gitopia/config/
-# Проверим генезис
-sha256sum ~/.gitopia/config/genesis.json
-# 12ed9158ae8a8d0051ad5f928685cf99eaec2c3efab2ee1bcf9e97cf432e8d33
+```
+#### Проверим генезис
+`sha256sum ~/.gitopia/config/genesis.json`
+#### 12ed9158ae8a8d0051ad5f928685cf99eaec2c3efab2ee1bcf9e97cf432e8d33
 
-# Проверим генезис
+#### Проверим генезис
+```
 gitopiad validate-genesis
-Проверяем, что состояние валидатора на начальном этапе
-
+```
+#### Проверяем, что состояние валидатора на начальном этапе
+```
 cd && cat .gitopia/data/priv_validator_state.json
 {
   "height": "0",
   "round": 0,
   "step": 0
 }
-
-# если нет, то выполняем команду
+```
+#### если нет, то выполняем команду
+```
 gitopiad unsafe-reset-all
-Настраиваем конфигурацию ноды
-Правим конфиг, благодаря чему мы можем больше не использовать флаг chain-idдля каждой команды CLI $HOME/.gitopia/config/client.toml 
-
+```
+#### Настраиваем конфигурацию ноды
+#### Правим конфиг, благодаря чему мы можем больше не использовать флаг chain-idдля каждой команды CLI $HOME/.gitopia/config/client.toml 
+```
 gitopiad config chain-id gitopia-janus-testnet
-Настраиваем минимальную цену за газ $HOME/.gitopia/config/app.toml
-
+```
+#### Настраиваем минимальную цену за газ $HOME/.gitopia/config/app.toml
+```
 sed -i.bak -e "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0.001utlore\"/;" ~/.gitopia/config/app.toml
-Настраиваем прунинг одной командой $HOME/.gitopia/config/app.toml
-
+```
+#### Настраиваем прунинг одной командой $HOME/.gitopia/config/app.toml
+```
 pruning="custom" && \
 pruning_keep_recent="100" && \
 pruning_keep_every="0" && \
@@ -246,7 +261,10 @@ sed -i -e "s/^pruning *=.*/pruning = \"$pruning\"/" $HOME/.gitopia/config/app.to
 sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \"$pruning_keep_recent\"/" $HOME/.gitopia/config/app.toml && \
 sed -i -e "s/^pruning-keep-every *=.*/pruning-keep-every = \"$pruning_keep_every\"/" $HOME/.gitopia/config/app.toml && \
 sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"$pruning_interval\"/" $HOME/.gitopia/config/app.toml
-Добавляем seed/peers $HOME/.gitopia/config/config.toml
+```
+Добавляем 
+```
+seed/peers $HOME/.gitopia/config/config.toml
 
 external_address=$(wget -qO- eth0.me)
 
@@ -255,16 +273,18 @@ sed -i.bak -e "s/^external_address *=.*/external_address = \"$external_address:2
 
 seeds=""
 sed -i.bak -e "s/^seeds =.*/seeds = \"$seeds\"/" $HOME/.gitopia/config/config.toml
-(ОПЦИОНАЛЬНО) Выкл индексацию $HOME/.gitopia/config/config.toml
-
+```
+#### (ОПЦИОНАЛЬНО) Выкл индексацию $HOME/.gitopia/config/config.toml
+```
 indexer="null" && \
 sed -i -e "s/^indexer *=.*/indexer = \"$indexer\"/" $HOME/.gitopia/config/config.toml
-(ОПЦИОНАЛЬНО) Вкл/выкл снэпшоты $HOME/.gitopia/config/app.toml
+```
+#### (ОПЦИОНАЛЬНО) Вкл/выкл снэпшоты $HOME/.gitopia/config/app.toml
 
-# По умолчанию здесь снэпшоты включены "snapshot-interval=1500"
-# Важно: если устанавливаются снэпшоты, то snapshot-interval должен быть кратен pruning-keep-every
-Создаем сервисный файл
-
+#### По умолчанию здесь снэпшоты включены "snapshot-interval=1500"
+#### Важно: если устанавливаются снэпшоты, то snapshot-interval должен быть кратен pruning-keep-every
+### Создаем сервисный файл
+```
 sudo tee /etc/systemd/system/gitopiad.service > /dev/null <<EOF
 [Unit]
 Description=gitopia
@@ -280,18 +300,25 @@ LimitNOFILE=65535
 [Install]
 WantedBy=multi-user.target
 EOF
+```
+```
 sudo systemctl daemon-reload && \
 sudo systemctl enable gitopiad && \
 sudo systemctl restart gitopiad && sudo journalctl -u gitopiad -f -o cat
-Если после старта нода долго не может подцепиться к пирам, то ищем новые пиры или просим addrbook.json у кого-нибудь
+```
+##### Если после старта нода долго не может подцепиться к пирам, то ищем новые пиры или просим addrbook.json у кого-нибудь
 
-# стопаем ноду
+#### стопаем ноду
+```
 sudo systemctl stop gitopiad
-# меняем адресную книгу
-# перезагружаем ноду
+```
+#### меняем адресную книгу
+#### перезагружаем ноду
+```
 sudo systemctl restart gitopiad && journalctl -u gitopiad -f -o cat
-Создаем валидатора
-
+```
+#### Создаем валидатора
+```
 gitopiad tx staking create-validator \
 --chain-id gitopia-janus-testnet \
 --commission-rate=0.1 \
@@ -304,77 +331,106 @@ gitopiad tx staking create-validator \
 --from=<name_wallet> \
 --gas="auto" \
 --fees 555tlore
-Не забываем сохранить priv_validator_key.json
+```
+### Не забываем сохранить priv_validator_key.json
 
-Подробнее о создании/редактировании валидатора можно почитать здесь
+#### Подробнее о создании/редактировании валидатора можно почитать здесь
 
-Полезные команды
-Проверить блоки
-
+### Полезные команды
+#### Проверить блоки
+```
 gitopiad status 2>&1 | jq ."SyncInfo"."latest_block_height"
-Проверить логи
-
+```
+#### Проверить логи
+```
 sudo journalctl -u gitopiad -f -o cat
-Статус
-
+```
+#### Статус
+```
 curl localhost:26657/status
-Проверить баланс
-
+```
+#### Проверить баланс
+```
 gitopiad q bank balances <uptick1...>
-Проверить валидатора
-
+```
+#### Проверить валидатора
+```
 gitopiad query staking validator <uptickvaloper1...>
 gitopiad query staking validators --limit 1000000 -o json | jq '.validators[] | select(.description.moniker=="<name_moniker>")' | jq
-Собрать комиссионные + реварды
-
+```
+#### Собрать комиссионные + реварды
+```
 gitopiad tx distribution withdraw-rewards <uptickvaloper1...> --from <name_wallet> --fees 555auptick --commission -y
-Заделегировать себе в стейк еще (так отправляется 1 монетa)
-
+```
+#### Заделегировать себе в стейк еще (так отправляется 1 монетa)
+```
 gitopiad tx staking delegate <uptickvaloper1...> 1000000000000000000auptick --from <name_wallet> --fees 555auptick -y
-Unbond 
-
+```
+#### Unbond 
+```
 gitopiad tx staking unbond <defundvaloper1ms...> 10000000auptick --from <name_wallet> --fees 555auptick -y
-Отправить монеты на другой адрес
-
+```
+#### Отправить монеты на другой адрес
+```
 gitopiad tx bank send <name_wallet> <uptick1...> 10000000auptick --fees 555auptick -y
-Выбраться из тюрьмы
-
+```
+#### Выбраться из тюрьмы
+```
 gitopiad tx slashing unjail --from <name_wallet>
-Работа с кошельками
+```
+#### Работа с кошельками
 
-# вывести список кошельков
+#### вывести список кошельков
+```
 gitopiad keys list
-# показать ключ аккаунта
+```
+#### показать ключ аккаунта
+```
 gitopiad keys show <name_wallet> --bech acc
-# показать ключ валидатора
+```
+#### показать ключ валидатора
+```
 gitopiad keys show <name_wallet> --bech val
-# показать ключ консенсуса
+```
+#### показать ключ консенсуса
+```
 gitopiad keys show <name_wallet> --bech cons
-# запрос учетной записи
+```
+#### запрос учетной записи
+```
 gitopiad q auth account $(uptickd keys show <name_wallet> -a) -o text
-Узнать транзакцию создания валидатора (заменить свой valoper_address)
-
+```
+#### Узнать транзакцию создания валидатора (заменить свой valoper_address)
+```
 gitopiad query txs --events='create_validator.validator=<your_valoper_address>' -o=json | jq .txs[0].txhash -r
-Проверить сколько блоков пропущено валидатором и с какого блока актив
-
+```
+#### Проверить сколько блоков пропущено валидатором и с какого блока актив
+```
 gitopiad q slashing signing-info $(uptickd tendermint show-validator)
-Параметры сети
-
+```
+#### Параметры сети
+```
 gitopiad q staking params
-Очистка данных и обновление
+```
+#### Очистка данных и обновление
 
-# удаляем addrbook и очищаем данные
+#### удаляем addrbook и очищаем данные
+```
 rm $HOME/.gitopia/config/addrbook.json 
 gitopiad unsafe-reset-all
-
-# обновиться
+```
+#### обновиться
+```
 git clone gitopia://gitopia1dlpc7ps63kj5v0kn5v8eq9sn2n8v8r5z9jmwff/gitopia
 cd gitopia
 git fetch --all && git checkout master
 make install
-Проголосовать за предложение 
-
+```
+#### Проголосовать за предложение 
+```
 gitopiad tx gov vote 1 yes --from <name_wallet> --fees 555auptick
-Внести депозит в предложение
-
+```
+#### Внести депозит в предложение
+```
 gitopiad tx gov deposit 1 5000000auptick --from <name_wallet> --fees 555auptick
+```
